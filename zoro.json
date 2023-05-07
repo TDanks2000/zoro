@@ -1,0 +1,133 @@
+{
+    "id": "1",
+    "type": "source",
+    "subtypes": ["anime"],
+    "name": "Zoro.to",
+    "version": "0.1.0",
+    "updateUrl": "https://raw.githubusercontent.com/adolar0042/MyModule/main/module.json",
+    "metadata": {
+      "author": "Inumaki",
+      "description": "A module to get the data from Zoro.to",
+      "icon": "https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qe7kzhh0bo1qt9ohrxwb",
+      "lang": ["en-US"],
+      "baseURL": "https://mymodule.com",
+      "bgColor":  "#ffcb3d",
+      "fgColor": "#000000"
+    },
+    "code": {
+      "anime": {
+        "search": [{
+          "request": {
+            "url": "https://zoro.to/search?keyword=<query>",
+            "type": "GET",
+            "headers": [
+              {
+                "key": "",
+                "value": ""
+              }
+            ],
+            "body": null
+          },
+          "javascript": {
+            "code": "const elements = document.querySelectorAll('.film_list-wrap .film-detail > h3 > a');const images = document.querySelectorAll('.film_list-wrap .film-poster > img');const subDub = document.querySelectorAll('.film_list-wrap > div > .film-poster > div.tick.ltr');const epCounts = document.querySelectorAll('.film_list-wrap > div > .film-poster > .tick.ltr > div');const titles = [];for (let i = 0; i < elements.length; i++) {let hasSub = subDub[i].innerText.includes('SUB');let hasDub = subDub[i].innerText.includes('DUB');let counts = epCounts[i].innerText.replace('Ep ', '').split('/');titles.push({url: `https://zoro.to${elements[i].getAttribute('href')}`,img: images[i].getAttribute('data-src'),title: elements[i].innerText,indicatorText: `${hasSub ? 'Sub' : ''}${hasSub && hasDub ? '|' : ''}${hasDub ? 'Dub' : ''}`,currentCount: parseInt(counts[0]),totalCount: parseInt(counts[1]),});}let choutenDiv = document.getElementById('chouten');let resultElement = document.createElement('p');resultElement.innerText = JSON.stringify(titles);choutenDiv.appendChild(resultElement);",
+            "removeScripts": true,
+            "allowExternalScripts": false
+          }
+        }],
+        "info": [
+          {
+            "request": {
+              "url": "",
+              "type": "GET",
+              "headers": [
+                {
+                  "key": "",
+                  "value": ""
+                }
+              ],
+              "body": null
+            },
+            "javascript": {
+              "code": "let titles={primary:document.querySelector('.film-name.dynamic-name').innerText,secondary:document.querySelector('.anisc-info > .item.item-title > .name').innerText,};let description=document.querySelector('.item.item-title.w-hide > .text').innerText;let poster=document.querySelector('.film-poster-img')?.getAttribute('src');let status=Array.from(document.querySelectorAll('.item.item-title')).find((el)=>el.innerText.includes('Status')).querySelector('.name').innerText;let totalMediaCount = document.querySelector('.tick-eps').innerText;let seasons=[...document.querySelectorAll('.os-list > a')].map((season)=>{return season.innerText.trim()});let choutenDiv=document.getElementById('chouten');let resultElement=document.createElement('p');let nextUrl = 'https://zoro.to/ajax/v2/episode/list/' + document.getElementById('wrapper').getAttribute('data-id');resultElement.innerText = JSON.stringify({result: {id: '',titles: titles,altTitles: [],description: description,poster: poster,status: status,totalMediaCount: parseInt(totalMediaCount),mediaType: 'Episodes',seasons: seasons,mediaList: [[]],}, nextUrl: nextUrl});choutenDiv.appendChild(resultElement);",
+              "removeScripts": false,
+              "allowExternalScripts": true
+            }
+          },
+          {
+            "request": {
+              "url": "",
+              "type": "GET",
+              "headers": [
+                {
+                  "key": "",
+                  "value": ""
+                }
+              ],
+              "body": null
+            },
+            "javascript": {
+              "code": "const myElement = document.getElementById('json-result');const myJsonString = myElement.getAttribute('data-json');const myJsonObject = JSON.parse(myJsonString.replaceAll(\"'\", '\"'));const modified = document.createElement('div');modified.innerHTML = myJsonObject['html'];document.body.appendChild(modified);const allEpInfo = [...document.querySelectorAll('.ssl-item.ep-item')].map((e) => {return {url:'https://zoro.to/ajax/v2/episode/servers?episodeId=' +e.getAttribute('href').split('?ep=')[1],title: e.getAttribute('title'),number: parseFloat(e.getAttribute('data-number')),};});let choutenDiv = document.getElementById('chouten');let resultElement = document.createElement('p');resultElement.innerText = JSON.stringify(allEpInfo);choutenDiv.appendChild(resultElement);",
+              "removeScripts": false,
+              "allowExternalScripts": true,
+              "usesApi": true
+            }
+          }
+        ],
+        "mediaConsume": [
+          {
+            "request": {
+              "url": "",
+              "type": "GET",
+              "headers": [
+                {
+                  "key": "",
+                  "value": ""
+                }
+              ],
+              "body": null
+            },
+            "javascript": {
+              "code": "const myElement = document.getElementById('json-result');const myJsonString = myElement.getAttribute('data-json');const myJsonObject = JSON.parse(myJsonString.replaceAll(\"'\", '\"'));const modified = document.createElement('div');modified.innerHTML = myJsonObject['html'];document.body.appendChild(modified);let subServers = document.querySelector('.ps_-block.ps_-block-sub.servers-sub');let dubServers = document.querySelector('.ps_-block.ps_-block-sub.servers-dub');let elements = subServers.querySelectorAll('.server-item');let servers = [];for (let i = 0; i < elements.length; i++) {console.log(elements[i].innerText);servers.push({ url:'https://zoro.to/ajax/v2/episode/sources?id=' +elements[i].getAttribute('data-id'),name: elements[i].innerText + ' (Sub)',});}if(dubServers != null){elements = dubServers.querySelectorAll('.server-item');for (let i = 0; i < elements.length; i++) {console.log(elements[i].innerText);servers.push({ url:'https://zoro.to/ajax/v2/episode/sources?id=' +elements[i].getAttribute('data-id'),name: elements[i].innerText + ' (Dub)',});}}let choutenDiv = document.getElementById('chouten');let resultElement = document.createElement('p');resultElement.innerText = JSON.stringify({result: servers, nextUrl: servers[0].url});choutenDiv.appendChild(resultElement);",
+              "removeScripts": true,
+              "allowExternalScripts": false
+            }
+          },{
+            "request": {
+              "url": "",
+              "type": "GET",
+              "headers": [
+                {
+                  "key": "",
+                  "value": ""
+                }
+              ],
+              "body": null
+            },
+            "javascript": {
+              "code": "const myElement = document.getElementById('json-result');const myJsonString = myElement.getAttribute('data-json');const myJsonObject = JSON.parse(myJsonString.replaceAll(\"'\", '\"'));const embedId = myJsonObject['link'].replace('https://rapid-cloud.co/embed-6/', '').split('?')[0];const url = `https://rapid-cloud.co/ajax/embed-6/getSources?id=${embedId}`;let choutenDiv = document.getElementById('chouten');let resultElement = document.createElement('p');resultElement.innerText = JSON.stringify({result: [], nextUrl: url});choutenDiv.appendChild(resultElement);",
+              "removeScripts": true,
+              "allowExternalScripts": false
+            }
+          },
+          {
+            "request": {
+              "url": "",
+              "type": "GET",
+              "headers": [
+                {
+                  "key": "",
+                  "value": ""
+                }
+              ],
+              "body": null
+            },
+            "javascript": {
+              "code": "const myElement = document.getElementById('json-result');const myJsonString = myElement.getAttribute('data-json');const myJsonObject = JSON.parse(myJsonString.replaceAll(\"'\", '\"'));if(myJsonObject['encrypted'] == true) {function getFile(url) {var request = new XMLHttpRequest();request.open('GET', url, false);request.send(null);if (request.status === 200) {return request.responseText;} else {return null;}}let base64 = myJsonObject['sources'];let key = getFile('https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt');decryptedSources = CryptoJS.AES.decrypt(base64, key).toString(CryptoJS.enc.Utf8);let choutenDiv = document.getElementById('chouten');let resultElement = document.createElement('p');resultElement.innerText = JSON.stringify({result: {skips: myJsonObject['intro'] != null ? [{start: myJsonObject['intro']['start'], end: myJsonObject['intro']['end'], type: 'Opening'},{start: myJsonObject['outro']['start'], end: myJsonObject['outro']['end'], type: 'Ending'}] : [],sources: JSON.parse(decryptedSources), subtitles: myJsonObject['tracks'].map(element => {if(element['kind'] == 'captions'){return {url: element['file'], language: element['label']}}}).filter(elements => {return (elements != null && elements !== undefined && elements !== '');})},nextUrl: null});choutenDiv.appendChild(resultElement);} else {let choutenDiv = document.getElementById('chouten');let resultElement = document.createElement('p');resultElement.innerText = JSON.stringify({result: {skips: myJsonObject['intro'] != null ? [{start: myJsonObject['intro']['start'], end: myJsonObject['intro']['end'], type: 'Opening'},{start: myJsonObject['outro']['start'], end: myJsonObject['outro']['end'], type: 'Ending'}] : [],sources: myJsonObject['sources'], subtitles: myJsonObject['tracks'].map(element => {if(element['kind'] == 'captions'){return {url: element['file'], language: element['label']}}}).filter(elements => {return (elements != null && elements !== undefined && elements !== '');})},nextUrl: null});choutenDiv.appendChild(resultElement);}",
+              "removeScripts": false,
+              "allowExternalScripts": true
+            }
+          }
+        ]
+      }
+    }
+  }
